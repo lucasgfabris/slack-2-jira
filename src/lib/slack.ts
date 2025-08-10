@@ -78,109 +78,121 @@ export class SlackService {
     }
   }
 
-  static createTicketModal(triggerId: string) {
+  static createTicketModalView() {
     return {
-      response_action: 'push',
-      trigger_id: triggerId,
-      view: {
-        type: 'modal',
-        callback_id: 'create_ticket_modal',
-        title: {
-          type: 'plain_text',
-          text: 'Criar Ticket no Jira'
-        },
-        submit: {
-          type: 'plain_text',
-          text: 'Criar Ticket'
-        },
-        close: {
-          type: 'plain_text',
-          text: 'Cancelar'
-        },
-        blocks: [
-          {
-            type: 'input',
-            block_id: 'summary_block',
-            label: {
-              type: 'plain_text',
-              text: 'Título do Ticket'
-            },
-            element: {
-              type: 'plain_text_input',
-              action_id: 'summary_input',
-              placeholder: {
-                type: 'plain_text',
-                text: 'Digite o título do ticket'
-              },
-              multiline: false
-            }
+      type: 'modal',
+      callback_id: 'create_ticket_modal',
+      title: {
+        type: 'plain_text',
+        text: 'Criar Ticket no Jira'
+      },
+      submit: {
+        type: 'plain_text',
+        text: 'Criar Ticket'
+      },
+      close: {
+        type: 'plain_text',
+        text: 'Cancelar'
+      },
+      blocks: [
+        {
+          type: 'input',
+          block_id: 'summary_block',
+          label: {
+            type: 'plain_text',
+            text: 'Título do Ticket'
           },
-          {
-            type: 'input',
-            block_id: 'description_block',
-            label: {
+          element: {
+            type: 'plain_text_input',
+            action_id: 'summary_input',
+            placeholder: {
               type: 'plain_text',
-              text: 'Descrição'
+              text: 'Digite o título do ticket'
             },
-            element: {
-              type: 'plain_text_input',
-              action_id: 'description_input',
-              placeholder: {
-                type: 'plain_text',
-                text: 'Digite a descrição do ticket'
-              },
-              multiline: true
-            }
-          },
-          {
-            type: 'input',
-            block_id: 'priority_block',
-            label: {
-              type: 'plain_text',
-              text: 'Prioridade'
-            },
-            element: {
-              type: 'static_select',
-              action_id: 'priority_input',
-              placeholder: {
-                type: 'plain_text',
-                text: 'Selecione a prioridade'
-              },
-              options: [
-                {
-                  text: {
-                    type: 'plain_text',
-                    text: 'Baixa'
-                  },
-                  value: 'Baixa'
-                },
-                {
-                  text: {
-                    type: 'plain_text',
-                    text: 'Média'
-                  },
-                  value: 'Média'
-                },
-                {
-                  text: {
-                    type: 'plain_text',
-                    text: 'Alta'
-                  },
-                  value: 'Alta'
-                },
-                {
-                  text: {
-                    type: 'plain_text',
-                    text: 'Crítica'
-                  },
-                  value: 'Crítica'
-                }
-              ]
-            }
+            multiline: false
           }
-        ]
-      }
+        },
+        {
+          type: 'input',
+          block_id: 'description_block',
+          label: {
+            type: 'plain_text',
+            text: 'Descrição'
+          },
+          element: {
+            type: 'plain_text_input',
+            action_id: 'description_input',
+            placeholder: {
+              type: 'plain_text',
+              text: 'Digite a descrição do ticket'
+            },
+            multiline: true
+          }
+        },
+        {
+          type: 'input',
+          block_id: 'priority_block',
+          label: {
+            type: 'plain_text',
+            text: 'Prioridade'
+          },
+          element: {
+            type: 'static_select',
+            action_id: 'priority_input',
+            placeholder: {
+              type: 'plain_text',
+              text: 'Selecione a prioridade'
+            },
+            options: [
+              {
+                text: {
+                  type: 'plain_text',
+                  text: 'Baixa'
+                },
+                value: 'Baixa'
+              },
+              {
+                text: {
+                  type: 'plain_text',
+                  text: 'Média'
+                },
+                value: 'Média'
+              },
+              {
+                text: {
+                  type: 'plain_text',
+                  text: 'Alta'
+                },
+                value: 'Alta'
+              },
+              {
+                text: {
+                  type: 'plain_text',
+                  text: 'Crítica'
+                },
+                value: 'Crítica'
+              }
+            ]
+          }
+        }
+      ]
     }
+  }
+
+  static async openModal(triggerId: string, view: unknown) {
+    const response = await fetch('https://slack.com/api/views.open', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.SLACK_BOT_TOKEN}`
+      },
+      body: JSON.stringify({
+        trigger_id: triggerId,
+        view: view
+      })
+    })
+
+    return response
   }
 
   static async sendChannelMessage(channelId: string, message: SlackResponse) {

@@ -14,10 +14,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: 'Comando não reconhecido' })
     }
 
-    // Responder com um modal para coletar os dados do ticket
-    const modalResponse = SlackService.createTicketModal(command.trigger_id)
+    // Abrir o modal usando a API do Slack
+    const modalView = SlackService.createTicketModalView()
+    const response = await SlackService.openModal(command.trigger_id, modalView)
     
-    res.status(200).json(modalResponse)
+    if (!response.ok) {
+      throw new Error('Falha ao abrir modal')
+    }
+
+    // Responder com uma mensagem simples
+    res.status(200).json({
+      response_type: 'ephemeral',
+      text: 'Modal aberto! Preencha os dados do ticket.'
+    })
 
   } catch (error) {
     console.error('Erro ao processar comando:', error)
