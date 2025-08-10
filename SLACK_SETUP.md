@@ -10,14 +10,14 @@ Adicione as seguintes permissões:
 
 ### Event Subscriptions
 Configure os seguintes eventos:
-- **Request URL**: `https://slack-2-jira-8rvm.vercel.app/api/slack/interactions`
+- **Request URL**: `https://seu-dominio.vercel.app/api/slack/interactions`
 - **Bot Events**:
   - `message.channels` (opcional, para responder a mensagens)
 
 ### Slash Commands
 Configure o comando:
 - **Command**: `/criar-ticket`
-- **Request URL**: `https://slack-2-jira-8rvm.vercel.app/api/slack/command`
+- **Request URL**: `https://seu-dominio.vercel.app/api/slack/interactions`
 - **Short Description**: `Criar ticket no Jira`
 - **Usage Hint**: `[título] [descrição]`
 
