@@ -180,11 +180,18 @@ export class SlackService {
   }
 
   static async openModal(triggerId: string, view: unknown) {
+    const botToken = process.env.SLACK_BOT_TOKEN
+    if (!botToken) {
+      throw new Error('SLACK_BOT_TOKEN não está configurado')
+    }
+    
+    console.log('Usando bot token:', botToken.substring(0, 10) + '...')
+    
     const response = await fetch('https://slack.com/api/views.open', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.SLACK_BOT_TOKEN}`
+        'Authorization': `Bearer ${botToken}`
       },
       body: JSON.stringify({
         trigger_id: triggerId,

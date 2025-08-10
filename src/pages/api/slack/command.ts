@@ -16,11 +16,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Abrir o modal usando a API do Slack
     const modalView = SlackService.createTicketModalView()
+    console.log('Tentando abrir modal com trigger_id:', command.trigger_id)
+    
     const response = await SlackService.openModal(command.trigger_id, modalView)
     
     if (!response.ok) {
-      throw new Error('Falha ao abrir modal')
+      const errorText = await response.text()
+      console.error('Erro ao abrir modal:', response.status, errorText)
+      throw new Error(`Falha ao abrir modal: ${response.status} - ${errorText}`)
     }
+    
+    const responseData = await response.json()
+    console.log('Modal aberto com sucesso:', responseData)
 
     // Responder com uma mensagem simples
     res.status(200).json({
