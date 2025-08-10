@@ -5,8 +5,11 @@ Backend para integração entre Slack e Jira, permitindo criar tickets no Jira a
 ## Funcionalidades
 
 - Comando `/criar-ticket` no Slack
+- **Modal interativo** para preenchimento dos dados do ticket
 - Criação automática de tickets no Jira
-- Suporte a prioridades (Baixa, Média, Alta, Crítica)
+- Suporte a diferentes tipos de issue (Solicitação, Bug, Incidente)
+- Suporte a prioridades (Lowest, Low, Medium, High, Highest)
+- Validação de campos obrigatórios
 - Respostas visuais no Slack com links para o Jira
 - Totalmente compatível com Vercel
 
@@ -47,7 +50,10 @@ PORT=3000
 2. Configure as permissões necessárias:
    - `commands` - Para comandos slash
    - `chat:write` - Para enviar mensagens
+   - `views:open` - Para abrir modais
+   - `views:submit` - Para processar submissões de modais
 3. Configure o comando `/criar-ticket` com a URL: `https://your-domain.vercel.app/api/slack/command`
+4. Configure o endpoint de interações com a URL: `https://your-domain.vercel.app/api/slack/interactions`
 
 ### 3. Configuração do Jira
 
@@ -58,24 +64,38 @@ PORT=3000
 
 ### Comando no Slack
 
-```
-/criar-ticket [Prioridade] Título do ticket
+Digite `/criar-ticket` no Slack e um modal será aberto para preencher os dados do ticket.
 
-Descrição detalhada do ticket
-pode ter múltiplas linhas
-```
+### Modal de Criação
 
-### Exemplos
+O modal inclui os seguintes campos:
 
-```
-/criar-ticket [Alta] Bug crítico no login
-O sistema não está permitindo login de usuários
-com credenciais válidas. Urgente!
+- **Título do Ticket** (obrigatório): Nome/título do ticket
+- **Descrição** (obrigatório): Descrição detalhada do problema ou solicitação
+- **Tipo de Issue** (opcional): Solicitação, Bug ou Incidente
+- **Prioridade** (opcional): Lowest, Low, Medium, High, Highest
 
-/criar-ticket Melhoria na interface
-Adicionar botão de exportar relatórios
-na tela de dashboard
-```
+### Exemplos de Uso
+
+1. **Digite o comando:**
+   ```
+   /criar-ticket
+   ```
+
+2. **Preencha o modal que aparece:**
+   - Título: "Bug crítico no login"
+   - Descrição: "O sistema não está permitindo login de usuários com credenciais válidas. Urgente!"
+   - Tipo: Bug
+   - Prioridade: High
+
+3. **Clique em "Criar Ticket"**
+
+### Resposta
+
+Após criar o ticket, você receberá uma mensagem de confirmação com:
+- Link direto para o ticket no Jira
+- Número do ticket criado
+- Status de criação
 
 ## Desenvolvimento
 
@@ -104,6 +124,7 @@ npm start
 - `GET /` - Página inicial
 - `GET /api/health` - Health check
 - `POST /api/slack/command` - Endpoint para comandos do Slack
+- `POST /api/slack/interactions` - Endpoint para interações (modais) do Slack
 
 ## Estrutura do Projeto
 
@@ -116,7 +137,8 @@ src/
 │   ├── api/
 │   │   ├── health.ts
 │   │   └── slack/
-│   │       └── command.ts
+│   │       ├── command.ts      # Endpoint para comandos
+│   │       └── interactions.ts # Endpoint para modais
 │   └── index.tsx
 └── types/
     └── index.ts     # Tipos TypeScript
@@ -185,6 +207,35 @@ nano .env.local
 - **Dependabot**: Atualizações automáticas de dependências
 - **CodeQL**: Análise estática de código para vulnerabilidades
 - **Branch Protection**: Regras para branches principais
+
+## Troubleshooting
+
+### Problemas Comuns
+
+#### Modal não abre
+- Verifique se as permissões `views:open` e `views:submit` estão configuradas
+- Confirme se o endpoint de interações está configurado corretamente
+- Verifique os logs do servidor para erros de autenticação
+
+#### Ticket não é criado
+- Verifique se as credenciais do Jira estão corretas
+- Confirme se o projeto e chave do projeto existem
+- Verifique se o usuário tem permissão para criar tickets
+
+#### Erro de validação
+- Certifique-se de que título e descrição estão preenchidos
+- Verifique se os tipos de issue e prioridades são válidos para seu projeto Jira
+
+### Logs e Debug
+
+Para debug, verifique os logs do servidor:
+```bash
+# Em desenvolvimento
+npm run dev
+
+# Em produção (Vercel)
+# Verifique os logs no painel do Vercel
+```
 
 ## Licença
 
