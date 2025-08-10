@@ -3,6 +3,9 @@
   "functions": {
     "src/pages/api/slack/command.ts": {
       "maxDuration": 30
+    },
+    "src/pages/api/slack/interactions.ts": {
+      "maxDuration": 30
     }
   },
   "env": {
