@@ -2,13 +2,29 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { SlackService } from '@/lib/slack'
 import { JiraService } from '@/lib/jira'
 
+// Middleware para processar dados do Slack
+const parseSlackPayload = (req: NextApiRequest) => {
+  if (req.headers['content-type'] === 'application/x-www-form-urlencoded') {
+    // Slack envia dados como form-urlencoded
+    const body = req.body as string
+    const params = new URLSearchParams(body)
+    return JSON.parse(params.get('payload') || '{}')
+  }
+  return req.body
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Método não permitido' })
   }
 
   try {
-    const payload = JSON.parse(req.body.payload)
+    const payload = parseSlackPayload(req)
+    
+    // Verificar se é um challenge do Slack (para verificação de URL)
+    if (payload.type === 'url_verification') {
+      return res.status(200).json({ challenge: payload.challenge })
+    }
     
     // Verificar se é uma submissão de modal
     if (payload.type === 'view_submission' && payload.view.callback_id === 'create_ticket_modal') {
