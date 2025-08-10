@@ -31,8 +31,8 @@ export interface JiraIssue {
     issuetype: {
       name: string
     }
-    assignee?: {
-      name: string
+    assignee: {
+      emailAddress: string
     }
     priority?: {
       name: string
