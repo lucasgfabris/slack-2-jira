@@ -122,6 +122,70 @@ src/
     └── index.ts     # Tipos TypeScript
 ```
 
+## Segurança
+
+### GitHub Push Protection
+
+Este projeto utiliza o **GitHub Push Protection** para detectar e bloquear automaticamente commits que contenham secrets, tokens ou credenciais sensíveis.
+
+#### O que é protegido:
+- Tokens da API do Atlassian/Jira
+- Tokens do Slack Bot
+- Signing Secrets
+- Credenciais de acesso
+- Chaves de API
+
+#### Como funciona:
+O GitHub automaticamente escaneia todos os commits e bloqueia pushes que contenham padrões de secrets conhecidos, incluindo:
+- `ATATT3x...` (Atlassian API Tokens)
+- `xoxb-...` (Slack Bot Tokens)
+- `xoxp-...` (Slack User Tokens)
+- `sk-...` (OpenAI API Keys)
+- E muitos outros padrões
+
+### Boas Práticas de Segurança
+
+#### 1. Variáveis de Ambiente
+✅ **Correto:**
+```bash
+# .env.local (não commitado)
+JIRA_API_TOKEN=ATATT3x...
+SLACK_BOT_TOKEN=xoxb-...
+```
+
+❌ **Incorreto:**
+```javascript
+// Código hardcoded
+const token = "ATATT3x...";
+```
+
+#### 2. Arquivos Sensíveis
+O arquivo `postman_collection.json` está no `.gitignore` pois pode conter tokens de teste. Nunca commite este arquivo.
+
+#### 3. Tokens Comprometidos
+Se um token for exposto acidentalmente:
+1. **Revogue imediatamente** o token no painel do Atlassian/Slack
+2. **Gere um novo token**
+3. **Atualize as variáveis de ambiente**
+4. **Use `git filter-branch`** para remover o token do histórico
+
+#### 4. Configuração Local
+Para desenvolvimento local, use:
+```bash
+# Copie o exemplo
+cp env.example .env.local
+
+# Configure suas credenciais
+nano .env.local
+```
+
+### Recursos de Segurança
+
+- **Secret Scanning**: GitHub escaneia automaticamente por secrets
+- **Dependabot**: Atualizações automáticas de dependências
+- **CodeQL**: Análise estática de código para vulnerabilidades
+- **Branch Protection**: Regras para branches principais
+
 ## Licença
 
 MIT
