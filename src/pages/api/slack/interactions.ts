@@ -34,6 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const summary = values.summary_block.summary_input.value
       const description = values.description_block.description_input.value
       const priority = values.priority_block.priority_input.selected_option?.value
+      const issuetype = values.issuetype_block.issuetype_input.selected_option?.value || 'Solicitação'
 
       // Validar campos obrigatórios
       if (!summary || !description) {
@@ -66,7 +67,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             ]
           },
           issuetype: {
-            name: 'Task'
+            name: issuetype
           },
           priority: priority ? {
             name: priority

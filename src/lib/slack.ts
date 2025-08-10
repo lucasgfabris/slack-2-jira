@@ -131,6 +131,45 @@ export class SlackService {
         },
         {
           type: 'input',
+          block_id: 'issuetype_block',
+          label: {
+            type: 'plain_text',
+            text: 'Tipo de Issue'
+          },
+          element: {
+            type: 'static_select',
+            action_id: 'issuetype_input',
+            placeholder: {
+              type: 'plain_text',
+              text: 'Selecione o tipo'
+            },
+            options: [
+              {
+                text: {
+                  type: 'plain_text',
+                  text: 'Solicitação'
+                },
+                value: 'Solicitação'
+              },
+              {
+                text: {
+                  type: 'plain_text',
+                  text: 'Bug'
+                },
+                value: 'Bug'
+              },
+              {
+                text: {
+                  type: 'plain_text',
+                  text: 'Incidente'
+                },
+                value: 'Incidente'
+              }
+            ]
+          }
+        },
+        {
+          type: 'input',
           block_id: 'priority_block',
           label: {
             type: 'plain_text',
@@ -147,30 +186,37 @@ export class SlackService {
               {
                 text: {
                   type: 'plain_text',
-                  text: 'Baixa'
+                  text: 'Lowest'
                 },
-                value: 'Baixa'
+                value: 'Lowest'
               },
               {
                 text: {
                   type: 'plain_text',
-                  text: 'Média'
+                  text: 'Low'
                 },
-                value: 'Média'
+                value: 'Low'
               },
               {
                 text: {
                   type: 'plain_text',
-                  text: 'Alta'
+                  text: 'Medium'
                 },
-                value: 'Alta'
+                value: 'Medium'
               },
               {
                 text: {
                   type: 'plain_text',
-                  text: 'Crítica'
+                  text: 'High'
                 },
-                value: 'Crítica'
+                value: 'High'
+              },
+              {
+                text: {
+                  type: 'plain_text',
+                  text: 'Highest'
+                },
+                value: 'Highest'
               }
             ]
           }
