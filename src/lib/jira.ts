@@ -31,7 +31,7 @@ export class JiraService {
       issuetype: {
         name: string
       }
-      assignee: {
+      assignee?: {
         emailAddress: string
       }
       priority?: {

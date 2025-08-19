@@ -69,9 +69,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           issuetype: {
             name: issuetype
           },
-          assignee: {
-            emailAddress: process.env.JIRA_ASSIGNEE_EMAIL || 'guilherme.krause@yooga.com.br'
-          },
+          ...(process.env.JIRA_ASSIGNEE_EMAIL ? {
+            assignee: { emailAddress: process.env.JIRA_ASSIGNEE_EMAIL as string }
+          } : {}),
           priority: priority ? {
             name: priority
           } : undefined
