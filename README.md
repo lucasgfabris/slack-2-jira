@@ -17,9 +17,31 @@ Backend para integração entre Slack e Jira, permitindo criar tickets no Jira a
 
 - Next.js 14
 - TypeScript
-- Slack Bolt API
+- Slack Web API (views.open, chat.postMessage)
 - Jira REST API v3
 - Axios para requisições HTTP
+
+## Arquitetura e Fluxo
+
+1. Usuário digita `/criar-ticket` no Slack.
+2. Slack envia `POST` para `/api/slack/command`.
+   - O backend constrói a view do modal (`SlackService.createTicketModalView`) e chama `views.open` na Slack Web API (`SlackService.openModal`).
+   - Responde ao Slack com mensagem efêmera confirmando a abertura do modal.
+3. Ao submeter o modal, o Slack envia `POST` para `/api/slack/interactions` com `payload` do tipo `view_submission`.
+   - O backend valida os campos obrigatórios (título e descrição).
+4. Se válido, o backend cria o ticket no Jira via `JiraService.createIssue` (REST API v3).
+5. Em seguida, envia uma mensagem de confirmação no Slack com link para o ticket (`SlackService.createSuccessResponse` + `chat.postMessage`).
+
+### Pontos de Atenção
+
+- Endpoints no Slack:
+  - Slash Command `/criar-ticket` → `POST /api/slack/command` (correto conforme o código).
+  - Interações (modais) → `POST /api/slack/interactions`.
+- Assinatura de requisições do Slack: o projeto define `SLACK_SIGNING_SECRET`, porém a verificação de assinatura ainda não está implementada nos handlers. Recomenda-se validar `X-Slack-Signature` e `X-Slack-Request-Timestamp` em ambos os endpoints.
+- Destino da confirmação: atualmente a confirmação é enviada para o usuário (DM) usando `payload.user.id`. Caso prefira publicar no canal, use o `channel_id` adequado e garanta os escopos necessários (`chat:write` e, para canais públicos, `chat:write.public`).
+- Atribuição (assignee) no Jira: se `JIRA_ASSIGNEE_EMAIL` não estiver definido, há um e-mail padrão codificado. Recomenda-se definir a variável e remover o fallback do código.
+- Content-Type das interações: alguns clientes enviam `application/x-www-form-urlencoded; charset=utf-8`. Se necessário, ajuste a checagem para `includes('application/x-www-form-urlencoded')`.
+- Dependência `@slack/bolt`: está listada, mas a integração atual usa chamadas diretas à Slack Web API via `fetch`. Pode ser removida ou adotada plenamente.
 
 ## Configuração
 
@@ -38,6 +60,8 @@ JIRA_BASE_URL=https://your-domain.atlassian.net
 JIRA_EMAIL=your-email@domain.com
 JIRA_API_TOKEN=your-api-token
 JIRA_PROJECT_KEY=PROJ
+# Opcional
+JIRA_ASSIGNEE_EMAIL=assignee@domain.com
 
 # Server Configuration
 NODE_ENV=production
@@ -48,12 +72,11 @@ PORT=3000
 
 1. Crie um app no [Slack API](https://api.slack.com/apps)
 2. Configure as permissões necessárias:
-   - `commands` - Para comandos slash
+   - `commands` - Para slash commands
    - `chat:write` - Para enviar mensagens
-   - `views:open` - Para abrir modais
-   - `views:submit` - Para processar submissões de modais
-3. Configure o comando `/criar-ticket` com a URL: `https://your-domain.vercel.app/api/slack/command`
-4. Configure o endpoint de interações com a URL: `https://your-domain.vercel.app/api/slack/interactions`
+   - `chat:write.public` (opcional) - Para enviar mensagens em canais públicos
+3. Ative "Interactivity & Shortcuts" e defina a Request URL: `https://your-domain.vercel.app/api/slack/interactions`
+4. Configure o comando `/criar-ticket` com a URL: `https://your-domain.vercel.app/api/slack/command`
 
 ### 3. Configuração do Jira
 
@@ -213,8 +236,9 @@ nano .env.local
 ### Problemas Comuns
 
 #### Modal não abre
-- Verifique se as permissões `views:open` e `views:submit` estão configuradas
-- Confirme se o endpoint de interações está configurado corretamente
+- Confirme se "Interactivity & Shortcuts" está habilitado e a Request URL é `/api/slack/interactions`
+- Verifique se o `SLACK_BOT_TOKEN` e o escopo `chat:write` estão corretos
+- Confira se o Slash Command aponta para `/api/slack/command`
 - Verifique os logs do servidor para erros de autenticação
 
 #### Ticket não é criado

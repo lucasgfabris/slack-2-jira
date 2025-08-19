@@ -6,18 +6,18 @@
 Adicione as seguintes permissões:
 - `commands` - Para slash commands
 - `chat:write` - Para enviar mensagens
-- `chat:write.public` - Para enviar mensagens em canais públicos
+- `chat:write.public` (opcional) - Para enviar mensagens em canais públicos
 
-### Event Subscriptions
-Configure os seguintes eventos:
+Observação: não existem escopos `views:*`. O uso de modais (`views.open`/`view_submission`) funciona com os escopos acima.
+
+### Interactivity & Shortcuts
+Ative a interatividade e configure:
 - **Request URL**: `https://seu-dominio.vercel.app/api/slack/interactions`
-- **Bot Events**:
-  - `message.channels` (opcional, para responder a mensagens)
 
 ### Slash Commands
 Configure o comando:
 - **Command**: `/criar-ticket`
-- **Request URL**: `https://seu-dominio.vercel.app/api/slack/interactions`
+- **Request URL**: `https://seu-dominio.vercel.app/api/slack/command`
 - **Short Description**: `Criar ticket no Jira`
 - **Usage Hint**: `[título] [descrição]`
 
@@ -31,6 +31,9 @@ JIRA_EMAIL=seu-email@exemplo.com
 JIRA_API_TOKEN=seu-token-api-jira
 JIRA_PROJECT_KEY=PROJ
 SLACK_BOT_TOKEN=xoxb-seu-bot-token
+SLACK_SIGNING_SECRET=seu-signing-secret
+# Opcional
+JIRA_ASSIGNEE_EMAIL=email.do.responsavel@exemplo.com
 ```
 
 ### Como obter o SLACK_BOT_TOKEN:
@@ -45,7 +48,7 @@ SLACK_BOT_TOKEN=xoxb-seu-bot-token
 4. Usuário preenche o modal e clica em "Criar Ticket"
 5. Slack envia os dados para `/api/slack/interactions`
 6. Backend cria o ticket no Jira
-7. Backend envia mensagem de confirmação no canal
+7. Backend envia mensagem de confirmação no Slack (DM do usuário ou canal configurado)
 
 ## 4. Teste
 
@@ -68,3 +71,4 @@ Após configurar tudo:
 ### Modal não aparece
 - Verifique se o SLACK_BOT_TOKEN está configurado
 - Confirme se as permissões do bot estão corretas
+- Em "Interactivity & Shortcuts", confirme se a **Request URL** está setada para `/api/slack/interactions` e validada
