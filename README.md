@@ -211,7 +211,7 @@ Se um token for exposto acidentalmente:
 3. **Atualize as variáveis de ambiente**
 4. **Use `git filter-branch`** para remover o token do histórico
 
-#### 4. Configuração Local
+#### 3. Configuração Local
 Para desenvolvimento local, use:
 ```bash
 # Copie o exemplo
