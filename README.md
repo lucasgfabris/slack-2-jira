@@ -204,10 +204,7 @@ SLACK_BOT_TOKEN=xoxb-...
 const token = "ATATT3x...";
 ```
 
-#### 2. Arquivos Sensíveis
-O arquivo `postman_collection.json` está no `.gitignore` pois pode conter tokens de teste. Nunca commite este arquivo.
-
-#### 3. Tokens Comprometidos
+#### 2. Tokens Comprometidos
 Se um token for exposto acidentalmente:
 1. **Revogue imediatamente** o token no painel do Atlassian/Slack
 2. **Gere um novo token**
